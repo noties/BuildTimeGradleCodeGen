@@ -1,0 +1,31 @@
+apply plugin: 'com.android.application'
+
+android {
+
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
+    
+    defaultConfig {
+        applicationId 'com.sample'
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 1
+        versionName '1.0.0'
+        
+        final def conf = project.hasProperty('supportedFeatures') \
+                ? 'flags == ' + project.get('supportedFeatures').split(',').join(' || flags == ') \
+                : 'false'
+
+        final def configurationImpl = """
+                public static class ConfigurationImpl implements Configuration {
+                    @Override
+                    public boolean hasFeature(int flags) {
+                        return $conf;
+                    }
+                }
+        """
+        
+        buildConfigField 'byte', '$$__$$', '0;\n' +
+                configurationImpl
+    }
+}
